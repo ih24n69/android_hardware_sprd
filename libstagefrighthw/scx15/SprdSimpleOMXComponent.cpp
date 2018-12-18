@@ -21,7 +21,6 @@
 #include "include/SprdSimpleOMXComponent.h"
 
 #include "gralloc_priv.h"
-#include "ion_sprd.h"
 
 #include <media/stagefright/foundation/ADebug.h>
 #include <media/stagefright/foundation/ALooper.h>

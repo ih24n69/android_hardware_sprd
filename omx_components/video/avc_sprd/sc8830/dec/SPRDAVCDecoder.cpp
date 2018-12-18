@@ -28,7 +28,6 @@
 #include <dlfcn.h>
 #include <media/hardware/HardwareAPI.h>
 #include <ui/GraphicBufferMapper.h>
-#include <colorformat_switcher.h>
 
 #include "gralloc_priv.h"
 #include "ion_sprd.h"
@@ -264,7 +263,6 @@ void SPRDAVCDecoder::initPorts() {
     def.format.video.bFlagErrorConcealment = OMX_FALSE;
     def.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     def.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
-    setColorFormat(def.format.video.eColorFormat);
     def.format.video.pNativeWindow = NULL;
 
     def.nBufferSize =
@@ -388,7 +386,11 @@ status_t SPRDAVCDecoder::initDecoder() {
     video_format.p_extra = NULL;
     video_format.p_extra_phy = 0;
     video_format.i_extra = 0;
-    video_format.yuv_format = YUV420SP_NV12;
+#ifdef SOC_SCX35
+    video_format.uv_interleaved = 1;
+#else
+     video_format.yuv_format = YUV420SP_NV12;
+#endif
 
     if ((*mH264DecInit)(mHandle, &codec_buf,&video_format) != MMDEC_OK) {
         ALOGE("Failed to init AVCDEC");
@@ -570,13 +572,11 @@ OMX_ERRORTYPE SPRDAVCDecoder::internalSetParameter(
             iUseAndroidNativeBuffer[OMX_DirOutput] = OMX_FALSE;
 
             pOutPort->mDef.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
-            setColorFormat(pOutPort->mDef.format.video.eColorFormat);
         } else {
             ALOGI("internalSetParameter, enable AndroidNativeBuffer");
             iUseAndroidNativeBuffer[OMX_DirOutput] = OMX_TRUE;
 
             pOutPort->mDef.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
-            setColorFormat(pOutPort->mDef.format.video.eColorFormat);
         }
         return OMX_ErrorNone;
     }
@@ -1012,7 +1012,7 @@ void SPRDAVCDecoder::onQueueFilled(OMX_U32 portIndex) {
                 return ;
             }
             ALOGV("%s, %d, pBuffer: 0x%x, vaddr: 0x%x", __FUNCTION__, __LINE__, outHeader->pBuffer,vaddr);
-            uint8 *yuv = (uint8 *)(vaddr + outHeader->nOffset);
+            uint8 *yuv = ((uint8 *)vaddr) + outHeader->nOffset;
             ALOGV("%s, %d, yuv: %0x, mPicId: %d, outHeader: %0x, outHeader->pBuffer: %0x, outHeader->nTimeStamp: %lld",
                   __FUNCTION__, __LINE__, yuv, mPicId,outHeader, outHeader->pBuffer, outHeader->nTimeStamp);
             (*mH264Dec_SetCurRecPic)(mHandle, yuv, (uint8 *)picPhyAddr, (void *)outHeader, mPicId);
@@ -1062,7 +1062,8 @@ void SPRDAVCDecoder::onQueueFilled(OMX_U32 portIndex) {
         MMDecRet ret;
         ret = (*mH264DecGetInfo)(mHandle, &decoderInfo);
         if(ret == MMDEC_OK) {
-#if 0
+
+#if SOC_SCX35
             if (!((decoderInfo.picWidth<= mMaxWidth&& decoderInfo.picHeight<= mMaxHeight)
                     || (decoderInfo.picWidth <= mMaxHeight && decoderInfo.picHeight <= mMaxWidth))) {
                 ALOGE("[%d,%d] is out of range [%d, %d], failed to support this format.",

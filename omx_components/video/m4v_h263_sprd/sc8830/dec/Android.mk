@@ -5,6 +5,10 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
 	SPRDMPEG4Decoder.cpp
 
+ifeq ($(strip $(SOC_SCX35)),true)
+LOCAL_CFLAGS += -DSOC_SCX35
+endif
+
 LOCAL_C_INCLUDES := \
 	frameworks/av/media/libstagefright/include \
 	frameworks/native/include/media/openmax \
@@ -25,7 +29,6 @@ LOCAL_CFLAGS := \
 LOCAL_ARM_MODE := arm
 
 LOCAL_SHARED_LIBRARIES := \
-	libcolorformat_switcher \
 	libstagefright \
 	libstagefright_omx \
 	libstagefright_foundation \

@@ -5,6 +5,10 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
 	SPRDMPEG4Encoder.cpp
 
+ifeq ($(strip $(SOC_SCX35)),true)
+LOCAL_CFLAGS += -DSOC_SCX35
+endif
+
 LOCAL_C_INCLUDES := \
 	frameworks/av/media/libstagefright/include \
 	frameworks/native/include/media/openmax \

@@ -22,7 +22,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := libmemoryheapion
 
 LOCAL_SRC_FILES := \
-	MemoryHeapIon_SPRD.cpp
+	MemoryHeapIon.cpp
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
@@ -40,6 +40,10 @@ LOCAL_SHARED_LIBRARIES := \
 	libutils
 
 LOCAL_MODULE_TAGS := optional
+
+LOCAL_POST_INSTALL_CMD := \
+	$(hide) mkdir -p $(TARGET_OUT_SHARED_LIBRARIES); \
+	ln -sf $(LOCAL_MODULE).so $(TARGET_OUT_SHARED_LIBRARIES)/libmemoryheapion_sprd.so
 
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 

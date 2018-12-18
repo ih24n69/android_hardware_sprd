@@ -35,7 +35,7 @@
  ** Author:         zhongjun.chen@spreadtrum.com                              *
  *****************************************************************************/
 
-#include <MemoryHeapIon.h>
+#include <binder/MemoryHeapIon.h>
 #include "SprdWIDIBlit.h"
 #include "../SprdHWLayer.h"
 #include "../SprdPrimaryDisplayDevice/SprdFrameBufferHAL.h"
@@ -148,13 +148,9 @@ bool SprdWIDIBlit:: threadLoop()
     unsigned int width = 0;
     unsigned int height = 0;
     int format = -1;
-#ifdef SCX30G_V2
     size_t size = -1;
     size_t size2 = 1;
-#else
-    int size = -1;
-    int size2 = 1;
-#endif
+
 
     HWC_TRACE_BEGIN_WIDIBLIT;
 

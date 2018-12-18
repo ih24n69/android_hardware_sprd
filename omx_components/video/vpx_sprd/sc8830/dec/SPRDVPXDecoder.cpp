@@ -26,7 +26,6 @@
 #include <media/IOMX.h>
 #include <media/hardware/HardwareAPI.h>
 #include <ui/GraphicBufferMapper.h>
-#include <colorformat_switcher.h>
 
 #include "gralloc_priv.h"
 #include "vpx_dec_api.h"
@@ -189,7 +188,6 @@ void SPRDVPXDecoder::initPorts() {
     def.format.video.bFlagErrorConcealment = OMX_FALSE;
     def.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     def.format.video.eColorFormat = OMX_COLOR_FormatYUV420Planar;
-    setColorFormat(def.format.video.eColorFormat);
     def.format.video.pNativeWindow = NULL;
 
     def.nBufferSize =
@@ -438,13 +436,11 @@ OMX_ERRORTYPE SPRDVPXDecoder::internalSetParameter(
             iUseAndroidNativeBuffer[OMX_DirOutput] = OMX_FALSE;
 
             pOutPort->mDef.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
-            setColorFormat(pOutPort->mDef.format.video.eColorFormat);
         } else {
             ALOGI("internalSetParameter, enable AndroidNativeBuffer");
             iUseAndroidNativeBuffer[OMX_DirOutput] = OMX_TRUE;
 
             pOutPort->mDef.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
-            setColorFormat(pOutPort->mDef.format.video.eColorFormat);
         }
         return OMX_ErrorNone;
     }
@@ -801,7 +797,7 @@ void SPRDVPXDecoder::onQueueFilled(OMX_U32 portIndex) {
                 return ;
             }
 //    	ALOGI("%s, %d, pBuffer: 0x%x, vaddr: 0x%x", __FUNCTION__, __LINE__, outHeader->pBuffer,vaddr);
-            uint8 *yuv = (uint8 *)(vaddr + outHeader->nOffset);
+            uint8 *yuv = ((uint8 *)vaddr) + outHeader->nOffset;
             ALOGI("%s, %d, yuv: %0x,outHeader->pBuffer: %0x, outHeader->nOffset: %d, outHeader->nFlags: %d, outHeader->nTimeStamp: %lld",
                   __FUNCTION__, __LINE__, yuv, outHeader->pBuffer, outHeader->nOffset, outHeader->nFlags, outHeader->nTimeStamp);
             (*mVPXDecSetCurRecPic)(mHandle, yuv, (uint8 *)picPhyAddr, (void *)outHeader);

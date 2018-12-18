@@ -244,12 +244,18 @@ endif
 LOCAL_MODULE_TAGS := optional
 
 ifeq ($(strip $(sc8830like)),1)
+ifeq ($(SOC_SCX35),true)
 LOCAL_SHARED_LIBRARIES := libexif libutils libbinder libcamera_client libskia libcutils libsqlite libhardware libmorpho_easy_hdr libcamera_metadata libmemoryheapion
+else
+LOCAL_SHARED_LIBRARIES := libexif libutils libbinder libcamera_client libskia libcutils libsqlite libhardware libmorpho_easy_hdr libcamera_metadata libmemoryheapion_sprd
+endif
 endif
 
 ifdef CONFIG_CAMERA_ISP
 LOCAL_SHARED_LIBRARIES += libisp
 endif
+
+LOCAL_LDFLAGS += -Wl,--no-fatal-warnings
 
 include $(BUILD_SHARED_LIBRARY)
 

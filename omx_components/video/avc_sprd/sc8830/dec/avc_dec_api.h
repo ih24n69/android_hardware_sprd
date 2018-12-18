@@ -64,6 +64,7 @@ typedef enum {
     RV9
 } VIDEO_STANDARD_E;
 
+#ifndef SOC_SCX35
 typedef enum
 {
     YUV420P_YU12 = 0,
@@ -71,6 +72,7 @@ typedef enum
     YUV420SP_NV12 = 2,   /*u/v interleaved*/
     YUV420SP_NV21 = 3,   /*v/u interleaved*/
 } MM_YUV_FORMAT_E;
+#endif
 
 // decoder video format structure
 typedef struct
@@ -81,7 +83,11 @@ typedef struct
     int32	i_extra;
     void 	*p_extra;
     uint32	p_extra_phy;
-    int32	yuv_format;
+#ifdef SOC_SCX35
+    int32	uv_interleaved;
+#else
+     int32	yuv_format;
+#endif
 } MMDecVideoFormat;
 
 // Decoder buffer for decoding structure

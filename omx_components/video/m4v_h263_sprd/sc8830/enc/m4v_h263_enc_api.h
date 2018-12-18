@@ -82,7 +82,7 @@ typedef struct
 
 typedef MMCodecBuffer MMEncBuffer;
 
-
+#ifndef SOC_SCX35
 typedef enum
 {
     MMENC_YUV420P_YU12 = 0,
@@ -90,6 +90,7 @@ typedef enum
     MMENC_YUV420SP_NV12 = 2,   /*u/v interleaved*/
     MMENC_YUV420SP_NV21 = 3,   /*v/u interleaved*/
 } MMENC_YUV_FORMAT_E;
+#endif
 
 // Encoder video format structure
 typedef struct
@@ -98,7 +99,11 @@ typedef struct
     int32	frame_width;				//frame width
     int32	frame_height;				//frame Height
     int32	time_scale;
-    int32	yuv_format;
+#ifdef SOC_SCX35
+    int32	uv_interleaved;				//tmp add
+#else
+     int32	yuv_format;
+#endif
     int32	b_anti_shake;
 } MMEncVideoInfo;
 
