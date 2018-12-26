@@ -5,18 +5,23 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
 	SPRDVPXDecoder.cpp
 
-ifeq ($(strip $(SOC_SCX35)),true)
-LOCAL_CFLAGS += -DSOC_SCX35
-endif
-
 LOCAL_C_INCLUDES := \
 	frameworks/av/media/libstagefright/include \
 	frameworks/native/include/media/openmax \
 	frameworks/native/include/media/hardware \
 	frameworks/native/include/ui \
 	frameworks/native/include/utils \
-	frameworks/native/include/media/hardware \
-	$(LOCAL_PATH)/../../../../../gralloc/$(TARGET_BOARD_PLATFORM) \
+	frameworks/native/include/media/hardware
+
+ifeq ($(strip $(SOC_SCX35)),true)
+LOCAL_C_INCLUDES += \
+	$(LOCAL_PATH)/../../../../../gralloc/scx15
+else
+LOCAL_C_INCLUDES += \
+	$(LOCAL_PATH)/../../../../../gralloc/$(TARGET_BOARD_PLATFORM)
+endif
+
+LOCAL_C_INCLUDES += \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/video
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
@@ -29,6 +34,7 @@ LOCAL_CFLAGS := \
 LOCAL_ARM_MODE := arm
 
 LOCAL_SHARED_LIBRARIES := \
+	libcolorformat_switcher \
 	libstagefright \
 	libstagefright_omx \
 	libstagefright_foundation \

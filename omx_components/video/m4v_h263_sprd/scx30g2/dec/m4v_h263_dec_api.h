@@ -1,5 +1,5 @@
 /******************************************************************************
- ** File Name:    h264dec.h                                                   *
+ ** File Name:    mpeg4dec.h                                                  *
  ** Author:                                     		                      *
  ** DATE:         3/15/2007                                                   *
  ** Copyright:    2007 Spreadtrum, Incorporated. All Rights Reserved.         *
@@ -11,8 +11,8 @@
  ** DATE          NAME            DESCRIPTION                                 *
  ** 3/15/2007     			      Create.                                     *
  *****************************************************************************/
-#ifndef _H264_DEC_H_
-#define _H264_DEC_H_
+#ifndef _MP4_H263_DEC_API_H_
+#define _MP4_H263_DEC_API_H_
 
 /*----------------------------------------------------------------------------*
 **                        Dependencies                                        *
@@ -31,12 +31,32 @@ typedef unsigned char		BOOLEAN;
 typedef unsigned char		uint8;
 typedef unsigned short		uint16;
 typedef unsigned int		uint32;
-//typedef unsigned int		uint;
+typedef unsigned long long 	uint64;
+typedef signed long long 	int64;
 
 typedef signed char			int8;
 typedef signed short		int16;
 typedef signed int			int32;
 
+/*standard*/
+typedef enum {
+    ITU_H263 = 0,
+    MPEG4,
+    JPEG,
+    FLV_V1,
+    H264,
+    RV8,
+    RV9
+} VIDEO_STANDARD_E;
+
+typedef enum
+{
+    INTER_MEM = 0,  /*internal memory, only for software writing and reading and initialized when initialize decoder*/
+    HW_NO_CACHABLE, /*physical continuous and no-cachable, only for VSP writing and reading */
+    HW_CACHABLE,    /*physical continuous and cachable, for software writing and VSP reading */
+    SW_CACHABLE,    /*only for software writing and reading*/
+    MAX_MEM_TYPE
+} CODEC_BUF_TYPE;
 
 typedef enum
 {
@@ -53,18 +73,6 @@ typedef enum
     MMDEC_MEMORY_ALLOCED = -10
 } MMDecRet;
 
-/*standard*/
-typedef enum {
-    ITU_H263 = 0,
-    MPEG4,
-    JPEG,
-    FLV_V1,
-    H264,
-    RV8,
-    RV9
-} VIDEO_STANDARD_E;
-
-#ifndef SOC_SCX35
 typedef enum
 {
     YUV420P_YU12 = 0,
@@ -72,7 +80,7 @@ typedef enum
     YUV420SP_NV12 = 2,   /*u/v interleaved*/
     YUV420SP_NV21 = 3,   /*v/u interleaved*/
 } MM_YUV_FORMAT_E;
-#endif
+
 
 // decoder video format structure
 typedef struct
@@ -81,20 +89,17 @@ typedef struct
     int32	frame_width;
     int32	frame_height;
     int32	i_extra;
-    void 	*p_extra;
-    uint32	p_extra_phy;
-#ifdef SOC_SCX35
-    int32	uv_interleaved;
-#else
-    int32	yuv_format;
-#endif
+    uint8 *p_extra;
+    unsigned long p_extra_phy;
+    //int32	uv_interleaved;
+    int32   yuv_format;
 } MMDecVideoFormat;
 
 // Decoder buffer for decoding structure
 typedef struct
 {
     uint8	*common_buffer_ptr;     // Pointer to buffer used when decoding
-    uint32 common_buffer_ptr_phy;
+    unsigned long common_buffer_ptr_phy;
     uint32	size;            		// Number of bytes decoding buffer
 
     int32 	frameBfr_num;			//YUV frame buffer number
@@ -102,6 +107,8 @@ typedef struct
     uint8   *int_buffer_ptr;		// internal memory address
     int32 	int_size;				//internal memory size
 } MMCodecBuffer;
+
+typedef MMCodecBuffer MMDecBuffer;
 
 typedef struct
 {
@@ -114,13 +121,13 @@ typedef struct
 // Decoder input structure
 typedef struct
 {
-    uint8		*pStream;          	// Pointer to stream to be decoded
-    uint32		pStream_phy;          	// Pointer to stream to be decoded, phy
+    uint8		*pStream;          	// Pointer to stream to be decoded. Virtual address.
+    unsigned long pStream_phy;          	// Pointer to stream to be decoded. Physical address.
     uint32		dataLen;           	// Number of bytes to be decoded
     int32		beLastFrm;			// whether the frame is the last frame.  1: yes,   0: no
 
     int32		expected_IVOP;		// control flag, seek for IVOP,
-    int32		pts;                // presentation time stamp
+    uint64		nTimeStamp;                // time stamp, it maybe PTS or DTS
 
     int32		beDisplayed;		// whether the frame to be displayed    1: display   0: not //display
 
@@ -138,55 +145,22 @@ typedef struct
     uint32	frame_width;
     uint32	frame_height;
 
-    int32   is_transposed;	//the picture is transposed or not, in 8800S4, it should always 0.
+    int32   is_transposed;	//the picture is transposed or not, in 8800H5, it should always 0.
 
-    int32	pts;            //presentation time stamp
+    uint64	pts;            //presentation time stamp
     int32	frameEffective;
 
     int32	err_MB_num;		//error MB number
     void *pBufferHeader;
-    int reqNewBuf;
-    int32 mPicId;
+    int VopPredType;
 } MMDecOutput;
 
-typedef enum
-{
-    INTER_MEM = 0,  /*internal memory, only for software writing and reading and initialized when initialize decoder*/
-    HW_NO_CACHABLE, /*physical continuous and no-cachable, only for VSP writing and reading */
-    HW_CACHABLE,    /*physical continuous and cachable, for software writing and VSP reading */
-    SW_CACHABLE,    /*only for software writing and reading*/
-    MAX_MEM_TYPE
-} CODEC_BUF_TYPE;
-
-typedef struct
-{
-    uint32 cropLeftOffset;
-    uint32 cropOutWidth;
-    uint32 cropTopOffset;
-    uint32 cropOutHeight;
-} CropParams;
-
-typedef struct
-{
-    uint32 profile;
-    uint32 picWidth;
-    uint32 picHeight;
-    uint32 videoRange;
-    uint32 matrixCoefficients;
-    uint32 parWidth;
-    uint32 parHeight;
-    uint32 croppingFlag;
-    CropParams cropParams;
-    uint32 numRefFrames;
-    uint32 has_b_frames;
-} H264SwDecInfo;
-
-typedef int (*FunctionType_BufCB)(void *userdata,void *pHeader);
-typedef int (*FunctionType_MallocCB)(void* aUserData, unsigned int size_extra);
+typedef int (*FunctionType_BufCB)(void *userdata,void *pHeader,int flag);
+typedef int (*FunctionType_MemAllocCB)(void *userData, unsigned int extra_mem_size);
 
 /* Application controls, this structed shall be allocated */
 /*    and initialized in the application.                 */
-typedef struct tagAVCHandle
+typedef struct tagMP4Handle
 {
     /* The following fucntion pointer is copied to BitstreamDecVideo structure  */
     /*    upon initialization and never used again. */
@@ -199,37 +173,49 @@ typedef struct tagAVCHandle
 #ifdef PV_MEMORY_POOL
     int32 size;
 #endif
+//    int nLayers;
+    /* pointers to VOL data for frame-based decoding. */
+//    uint8 *volbuf[2];           /* maximum of 2 layers for now */
+//    int32 volbuf_size[2];
 
     void *userdata;
 
     FunctionType_BufCB VSP_bindCb;
     FunctionType_BufCB VSP_unbindCb;
-    FunctionType_MallocCB VSP_extMemCb;
-} AVCHandle;
+    FunctionType_MemAllocCB VSP_extMemCb;
+
+    int g_mpeg4_dec_err_flag;
+} MP4Handle;
 
 /**----------------------------------------------------------------------------*
 **                           Function Prototype                               **
 **----------------------------------------------------------------------------*/
+void MP4DecReleaseRefBuffers(MP4Handle *mp4Handle);
+int MP4DecGetLastDspFrm(MP4Handle *mp4Handle, void **pOutput);
+void MP4DecSetCurRecPic(MP4Handle *mp4Handle, uint8	*pFrameY,uint8 *pFrameY_phy,void *pBufferHeader);
+void MP4DecSetReferenceYUV(MP4Handle *mp4Handle, uint8 *pFrameY);
 
-MMDecRet H264DecGetNALType(AVCHandle *avcHandle, uint8 *bitstream, int size, int *nal_type, int *nal_ref_idc);
-MMDecRet H264DecGetInfo(AVCHandle *avcHandle, H264SwDecInfo *pDecInfo);
-MMDecRet H264GetCodecCapability(AVCHandle *avcHandle, int32 *max_width, int32 *max_height);
+void Mp4GetVideoDimensions(MP4Handle *mp4Handle, int32 *display_width, int32 *display_height);
+void Mp4GetBufferDimensions(MP4Handle *mp4Handle, int32 *width, int32 *height);
+MMDecRet MP4GetCodecCapability(MP4Handle *mp4Handle, int32 *max_width, int32 *max_height);
 
 /*****************************************************************************/
-//  Description: Init h264 decoder
+//  Description: Init mpeg4 decoder
 //	Global resource dependence:
 //  Author:
 //	Note:
 /*****************************************************************************/
-MMDecRet H264DecInit(AVCHandle *avcHandle, MMCodecBuffer * pBuffer,MMDecVideoFormat * pVideoFormat);
+MMDecRet MP4DecInit(MP4Handle *mp4Handle, MMCodecBuffer * pBuffer);
+
+MMDecRet MP4DecVolHeader(MP4Handle *mp4Handle, MMDecVideoFormat *video_format_ptr);
 
 /*****************************************************************************/
-//  Description: Init h264 decoder	memory
+//  Description: Init mpeg4 decoder	memory
 //	Global resource dependence:
 //  Author:
 //	Note:
 /*****************************************************************************/
-MMDecRet H264DecMemInit(AVCHandle *avcHandle, MMCodecBuffer *pBuffer);
+MMDecRet MP4DecMemInit(MP4Handle *mp4Handle, MMCodecBuffer *pBuffer);
 
 /*****************************************************************************/
 //  Description: Decode one vop
@@ -237,32 +223,30 @@ MMDecRet H264DecMemInit(AVCHandle *avcHandle, MMCodecBuffer *pBuffer);
 //  Author:
 //	Note:
 /*****************************************************************************/
-MMDecRet H264DecDecode(AVCHandle *avcHandle, MMDecInput *pInput,MMDecOutput *pOutput);
+MMDecRet MP4DecDecode(MP4Handle *mp4Handle, MMDecInput *pInput,MMDecOutput *pOutput);
 
 /*****************************************************************************/
-//  Description: Close h264 decoder
+//  Description: Close mpeg4 decoder
 //	Global resource dependence:
 //  Author:
 //	Note:
 /*****************************************************************************/
-MMDecRet H264DecRelease(AVCHandle *avcHandle);
+MMDecRet MP4DecRelease(MP4Handle *mp4Handle);
 
-void H264Dec_ReleaseRefBuffers(AVCHandle *avcHandle);
-MMDecRet H264Dec_GetLastDspFrm(AVCHandle *avcHandle, void **pOutput, int32 *picId);
-void H264Dec_SetCurRecPic(AVCHandle *avcHandle, uint8 *pFrameY,uint8 *pFrameY_phy,void *pBufferHeader, int32 picId);
+typedef void (*FT_MP4DecSetReferenceYUV)(MP4Handle *mp4Handle, uint8 *pFrameY);
+typedef void (*FT_MP4DecReleaseRefBuffers)(MP4Handle *mp4Handle);
+typedef int (*FT_MP4DecGetLastDspFrm)(MP4Handle *mp4Handle,void **pOutput);
+typedef void (*FT_MP4DecSetCurRecPic)(MP4Handle *mp4Handle, uint8	*pFrameY,uint8 *pFrameY_phy,void *pBufferHeader);
+typedef void (*FT_MP4DecSetReferenceYUV)(MP4Handle *mp4Handle, uint8 *pFrameY);
+typedef void (*FT_Mp4GetVideoDimensions)(MP4Handle *mp4Handle, int32 *display_width, int32 *display_height);
+typedef void (*FT_Mp4GetBufferDimensions)(MP4Handle *mp4Handle, int32 *width, int32 *height);
+typedef MMDecRet (*FT_MP4GetCodecCapability)(MP4Handle *mp4Handle, int32 *max_width, int32 *max_height);
 
-
-typedef MMDecRet (*FT_H264DecGetNALType)(AVCHandle *avcHandle, uint8 *bitstream, int size, int *nal_type, int *nal_ref_idc);
-typedef void (*FT_H264GetBufferDimensions)(AVCHandle *avcHandle, int32 *aligned_width, int32 *aligned_height) ;
-typedef MMDecRet (*FT_H264DecInit)(AVCHandle *avcHandle, MMCodecBuffer * pBuffer,MMDecVideoFormat * pVideoFormat);
-typedef MMDecRet (*FT_H264DecGetInfo)(AVCHandle *avcHandle, H264SwDecInfo *pDecInfo);
-typedef MMDecRet (*FT_H264GetCodecCapability)(AVCHandle *avcHandle, int32 *max_width, int32 *max_height);
-typedef MMDecRet (*FT_H264DecMemInit)(AVCHandle *avcHandle, MMCodecBuffer *pBuffer);
-typedef MMDecRet (*FT_H264DecDecode)(AVCHandle *avcHandle, MMDecInput *pInput,MMDecOutput *pOutput);
-typedef MMDecRet (*FT_H264DecRelease)(AVCHandle *avcHandle);
-typedef void (* FT_H264Dec_SetCurRecPic)(AVCHandle *avcHandle, uint8 *pFrameY,uint8 *pFrameY_phy,void *pBufferHeader, int32 picId);
-typedef MMDecRet (* FT_H264Dec_GetLastDspFrm)(AVCHandle *avcHandle, void **pOutput, int32 *picId);
-typedef void (* FT_H264Dec_ReleaseRefBuffers)(AVCHandle *avcHandle);
+typedef MMDecRet (*FT_MP4DecInit)(MP4Handle *mp4Handle, MMCodecBuffer * pBuffer);
+typedef MMDecRet (*FT_MP4DecVolHeader)(MP4Handle *mp4Handle, MMDecVideoFormat *video_format_ptr);
+typedef MMDecRet (*FT_MP4DecMemInit)(MP4Handle *mp4Handle, MMCodecBuffer *pBuffer);
+typedef MMDecRet (*FT_MP4DecDecode)(MP4Handle *mp4Handle, MMDecInput *pInput,MMDecOutput *pOutput);
+typedef MMDecRet (*FT_MP4DecRelease)(MP4Handle *mp4Handle);
 
 /**----------------------------------------------------------------------------*
 **                         Compiler Flag                                      **
@@ -271,5 +255,5 @@ typedef void (* FT_H264Dec_ReleaseRefBuffers)(AVCHandle *avcHandle);
 }
 #endif
 /**---------------------------------------------------------------------------*/
-#endif //_H264_DEC_H_
+#endif
 // End

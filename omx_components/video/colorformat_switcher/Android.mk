@@ -1,5 +1,8 @@
+# 
+# Copyright (C) 2010 ARM Limited. All rights reserved.
+# 
+# Copyright (C) 2008 The Android Open Source Project
 #
-# Copyright (C) 2016 The Android Open Source Project
 # Copyright (C) 2016 The CyanogenMod Project
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +20,26 @@
 
 LOCAL_PATH := $(call my-dir)
 
-ifeq ($(TARGET_BOARD_PLATFORM),scx15)
-include $(call all-makefiles-under,$(LOCAL_PATH))
-endif
+include $(CLEAR_VARS)
+
+LOCAL_MODULE := libcolorformat_switcher
+
+LOCAL_MODULE_TAGS := optional
+
+LOCAL_C_INCLUDES += \
+	$(TOP)/frameworks/av/include/media/ \
+	$(TOP)/frameworks/native/include/media/openmax
 
 ifeq ($(strip $(SOC_SCX35)),true)
-include $(call all-makefiles-under,$(LOCAL_PATH))
+LOCAL_C_INCLUDES += \
+       $(TOP)/hardware/sprd/gralloc/sc8830
+else
+LOCAL_C_INCLUDES += \
+       $(TOP)/hardware/sprd/gralloc/scx15
 endif
+
+LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)
+
+LOCAL_SRC_FILES := colorformat_switcher.cpp
+
+include $(BUILD_SHARED_LIBRARY)
