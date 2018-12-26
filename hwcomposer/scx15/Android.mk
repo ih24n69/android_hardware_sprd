@@ -56,20 +56,19 @@ LOCAL_SRC_FILES := \
 	SprdUtil.cpp \
 	dump.cpp \
 
+# Use scx15 for kanas/kanas3g
 ifeq ($(strip $(SOC_SCX35)),true)
-
 LOCAL_C_INCLUDES := \
-	$(LOCAL_PATH)/../../gralloc/scx15 \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/video/ \
-	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/
-
+	$(LOCAL_PATH)/../../gralloc/scx15
 else
-
 LOCAL_C_INCLUDES := \
+	$(LOCAL_PATH)/../../gralloc/$(TARGET_BOARD_PLATFORM)
+endif
+
+LOCAL_C_INCLUDES += \
 	$(LOCAL_PATH)/../../gralloc/$(TARGET_BOARD_PLATFORM) \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/video/ \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/
-endif
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
@@ -93,12 +92,11 @@ DEVICE_OVERLAYPLANE_BORROW_PRIMARYPLANE_BUFFER := true
 endif
 
 ifeq ($(TARGET_BOARD_PLATFORM),sc8830)
+DEVICE_USE_FB_HW_VSYNC := true
 
-ifeq ($(strip $(SOC_SCX35)),true)
-DEVICE_USE_FB_HW_VSYNC := true
-else
+# Kanas/kanas3g doesn't have this flag
+ifneq ($(strip $(SOC_SCX35)),true)
 DEVICE_DIRECT_DISPLAY_SINGLE_OSD_LAYER := true
-DEVICE_USE_FB_HW_VSYNC := true
 endif
 endif
 
