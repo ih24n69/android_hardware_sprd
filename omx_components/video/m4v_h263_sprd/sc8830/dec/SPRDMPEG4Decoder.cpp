@@ -26,6 +26,7 @@
 #include <media/IOMX.h>
 #include <media/hardware/HardwareAPI.h>
 #include <ui/GraphicBufferMapper.h>
+#include <colorformat_switcher.h>
 
 #include "gralloc_priv.h"
 #include "m4v_h263_dec_api.h"
@@ -251,6 +252,7 @@ void SPRDMPEG4Decoder::initPorts() {
     def.format.video.bFlagErrorConcealment = OMX_FALSE;
     def.format.video.eCompressionFormat = OMX_VIDEO_CodingUnused;
     def.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
+    setColorFormat(def.format.video.eColorFormat);
     def.format.video.pNativeWindow = NULL;
 
     def.nBufferSize =
@@ -299,9 +301,9 @@ void SPRDMPEG4Decoder::change_ddr_freq()
         else if(frame_size > 320*240)
         {
 #ifdef SOC_SCX35
-             ddr_freq = "300000";
+            ddr_freq = "300000";
 #else
-             ddr_freq = "200000";
+            ddr_freq = "200000";
 #endif
         }
 #endif
@@ -450,6 +452,7 @@ OMX_ERRORTYPE SPRDMPEG4Decoder::internalGetParameter(
             ALOGI("internalGetParameter, OMX_IndexParamVideoPortFormat, eColorFormat: 0x%x",pOutPort->mDef.format.video.eColorFormat);
             formatParams->eCompressionFormat = OMX_VIDEO_CodingUnused;
             formatParams->eColorFormat = pOutPort->mDef.format.video.eColorFormat;//OMX_COLOR_FormatYUV420Planar;
+            setColorFormat(pOutPort->mDef.format.video.eColorFormat);
             formatParams->xFramerate = 0;
         }
 
@@ -566,11 +569,13 @@ OMX_ERRORTYPE SPRDMPEG4Decoder::internalSetParameter(
             iUseAndroidNativeBuffer[OMX_DirOutput] = OMX_FALSE;
 
             pOutPort->mDef.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
+            setColorFormat(pOutPort->mDef.format.video.eColorFormat);
         } else {
             ALOGI("internalSetParameter, enable AndroidNativeBuffer");
             iUseAndroidNativeBuffer[OMX_DirOutput] = OMX_TRUE;
 
             pOutPort->mDef.format.video.eColorFormat = OMX_COLOR_FormatYUV420SemiPlanar;
+            setColorFormat(pOutPort->mDef.format.video.eColorFormat);
         }
         return OMX_ErrorNone;
     }
@@ -595,8 +600,8 @@ OMX_ERRORTYPE SPRDMPEG4Decoder::internalSetParameter(
 
         if (defParams->nBufferCountActual
                 != port->mDef.nBufferCountActual) {
-            CHECK_GE(defParams->nBufferCountActual,
-                     port->mDef.nBufferCountMin);
+            if (defParams->nBufferCountActual < port->mDef.nBufferCountMin)
+                return OMX_ErrorUnsupportedSetting;
 
             port->mDef.nBufferCountActual = defParams->nBufferCountActual;
         }

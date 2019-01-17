@@ -102,7 +102,7 @@ typedef struct
 #ifdef SOC_SCX35
     int32	uv_interleaved;				//tmp add
 #else
-     int32	yuv_format;
+    int32	yuv_format;
 #endif
     int32	b_anti_shake;
 } MMEncVideoInfo;
