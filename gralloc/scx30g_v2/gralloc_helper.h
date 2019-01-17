@@ -1,5 +1,7 @@
 /*
- * Copyright (C) 2010 The Android Open Source Project
+ * Copyright (C) 2010 ARM Limited. All rights reserved.
+ *
+ * Copyright (C) 2008 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +16,14 @@
  * limitations under the License.
  */
 
-#ifndef _COLORFORMAT_SWITCHER_H_
-#define _COLORFORMAT_SWITCHER_H_
+#ifndef GRALLOC_HELPER_H_
+#define GRALLOC_HELPER_H_
 
-#include <OMX_IVCommon.h>
+#include <sys/mman.h>
 
-void setColorFormat(OMX_COLOR_FORMATTYPE &eNativeColorFormat);
+inline size_t round_up_to_page_size(size_t x)
+{
+	return (x + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
+}
 
-#endif /* _COLORFORMAT_SWITCHER_H_ */
+#endif /* GRALLOC_HELPER_H_ */

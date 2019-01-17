@@ -1,8 +1,6 @@
 #ifndef __ENG_AUDIO_H__
 #define __ENG_AUDIO_H__
 
-#include <system/audio.h>
-
 #define NAME_LEN_MAX                            16
 #define EQ_BAND_MAX				8
 #define EQ_MODE_MAX                             6
@@ -80,6 +78,8 @@ enum{
 	SET_CALIBRATION_ENABLE,
 };
 
+#include <system/audio.h>
+
 enum {
     AUDIO_DEVICE_OUT_FM_HEADSET                = 0x10000000,
     AUDIO_DEVICE_OUT_FM_SPEAKER                = 0x20000000,
@@ -110,7 +110,6 @@ enum {
                                  AUDIO_DEVICE_OUT_SPEAKER_SAFE |
                                  AUDIO_DEVICE_OUT_IP |
                                  AUDIO_DEVICE_OUT_BUS |
-                                 AUDIO_DEVICE_OUT_PROXY |
                                  AUDIO_DEVICE_OUT_FM_HEADSET |
                                  AUDIO_DEVICE_OUT_FM_SPEAKER |
                                  AUDIO_DEVICE_OUT_DEFAULT),

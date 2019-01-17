@@ -382,8 +382,8 @@ OMX_ERRORTYPE SoftSPRDAVC::internalSetParameter(
 
         if (defParams->nBufferCountActual
                 != port->mDef.nBufferCountActual) {
-            if (defParams->nBufferCountActual < port->mDef.nBufferCountMin)
-                return OMX_ErrorUnsupportedSetting;
+            CHECK_GE(defParams->nBufferCountActual,
+                     port->mDef.nBufferCountMin);
 
             port->mDef.nBufferCountActual = defParams->nBufferCountActual;
         }

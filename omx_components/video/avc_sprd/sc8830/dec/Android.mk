@@ -5,6 +5,10 @@ include $(CLEAR_VARS)
 LOCAL_SRC_FILES := \
 	SPRDAVCDecoder.cpp \
 
+ifeq ($(strip $(SOC_SCX35)),true)
+LOCAL_CFLAGS += -DSOC_SCX35
+endif
+
 LOCAL_C_INCLUDES := \
 	frameworks/av/media/libstagefright/include \
 	frameworks/native/include/media/openmax \
@@ -34,9 +38,6 @@ LOCAL_SHARED_LIBRARIES := \
 	libui \
 	libdl \
 	liblog
-
-LOCAL_STATIC_LIBRARIES := \
-	libcolorformat_switcher
 
 LOCAL_MODULE := libstagefright_sprd_h264dec
 LOCAL_MODULE_TAGS := optional

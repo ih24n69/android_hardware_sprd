@@ -16,14 +16,10 @@
  * limitations under the License.
  */
 
-#ifndef GRALLOC_HELPER_H_
-#define GRALLOC_HELPER_H_
+#include <hardware/hardware.h>
 
-#include <sys/mman.h>
+// Create a framebuffer device
+int framebuffer_device_open(hw_module_t const *module, const char *name, hw_device_t **device);
 
-inline size_t round_up_to_page_size(size_t x)
-{
-    return (x + (PAGE_SIZE-1)) & ~(PAGE_SIZE-1);
-}
-
-#endif /* GRALLOC_HELPER_H_ */
+// Initialize the framebuffer (must keep module lock before calling
+int init_frame_buffer_locked(struct private_module_t *module);

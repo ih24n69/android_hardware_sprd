@@ -59,10 +59,20 @@ LOCAL_SRC_FILES := \
 	SprdUtil.cpp \
 	dump.cpp \
 
+ifeq ($(strip $(SOC_SCX35)),true)
+
+LOCAL_C_INCLUDES := \
+	$(LOCAL_PATH)/../../gralloc/scx15 \
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/video/ \
+	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/
+
+else
+
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/../../gralloc/$(TARGET_BOARD_PLATFORM) \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/video/ \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/
+endif
 
 LOCAL_ADDITIONAL_DEPENDENCIES += \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
@@ -86,8 +96,22 @@ DEVICE_OVERLAYPLANE_BORROW_PRIMARYPLANE_BUFFER := true
 endif
 
 ifeq ($(TARGET_BOARD_PLATFORM),sc8830)
+
+ifeq ($(strip $(SOC_SCX35)),true)
+DEVICE_USE_FB_HW_VSYNC := true
+else
 DEVICE_DIRECT_DISPLAY_SINGLE_OSD_LAYER := true
 DEVICE_USE_FB_HW_VSYNC := true
+endif
+endif
+
+# Force x/ydpi values reported by hwcomposer
+ifneq ($(DEVICE_REPORT_XDPI),)
+LOCAL_CFLAGS += -DDEVICE_REPORT_XDPI=$(DEVICE_REPORT_XDPI)
+endif
+
+ifneq ($(DEVICE_REPORT_YDPI),)
+LOCAL_CFLAGS += -DDEVICE_REPORT_YDPI=$(DEVICE_REPORT_YDPI)
 endif
 
 ifeq ($(TARGET_BOARD_PLATFORM),scx15)
@@ -101,7 +125,11 @@ endif
 
 ifeq ($(DEVICE_WITH_GSP),true)
 
+ifeq ($(strip $(SOC_SCX35)),true)
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libcamera/scx15/inc
+else
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/../libcamera/sc8830/inc
+endif
 
 #LOCAL_CFLAGS += -DVIDEO_LAYER_USE_RGB
 # PROCESS_VIDEO_USE_GSP : protecting sc8830 code
@@ -123,6 +151,11 @@ endif
 
 ifeq ($(TARGET_BOARD_PLATFORM),scx15)
 LOCAL_CFLAGS += -DGSP_ADDR_TYPE_PHY
+endif
+
+ifeq ($(strip $(SOC_SCX35)),true)
+LOCAL_CFLAGS += -DGSP_ADDR_TYPE_PHY
+LOCAL_CFLAGS += -DHWC_SUPPORT
 endif
 
 endif # DEVICE_WITH_GSP
