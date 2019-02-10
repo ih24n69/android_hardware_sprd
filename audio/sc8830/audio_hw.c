@@ -50,6 +50,8 @@ volatile int log_level = 4;
 #include <tinyalsautils.h>
 #include <audio_utils/resampler.h>
 
+#include <AtChannel.h>
+
 #include "audio_pga.h"
 #include "vb_effect_if.h"
 #include "vb_pga.h"
@@ -4011,12 +4013,10 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
      * 8KHz for BT headset NB, as default.
      * 16KHz for BT headset WB.
      * */
-    ret = str_parms_get_str(parms, AUDIO_PARAMETER_KEY_BT_SCO_WB, value, sizeof(value));
+    ret = str_parms_get_str(parms, "bt_samplerate", value, sizeof(value));
     if (ret >= 0) {
-        if (strcmp(value, AUDIO_PARAMETER_VALUE_OFF) == 0)
-            adev->bluetooth_type = VX_NB_SAMPLING_RATE;
-        else if (strcmp(value, AUDIO_PARAMETER_VALUE_ON) == 0)
-            adev->bluetooth_type = VX_WB_SAMPLING_RATE;
+        val = atoi(value);
+        adev->bluetooth_type = val;
     }
 
     //this para for Phone to set realcall state,because mode state may be not accurate
@@ -4033,7 +4033,7 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
         pthread_mutex_unlock(&adev->lock);
     }
 
-    ret = str_parms_get_str(parms, AUDIO_PARAMETER_KEY_SCREEN_STATE, value, sizeof(value));
+    ret = str_parms_get_str(parms, "screen_state", value, sizeof(value));
     if (ret >= 0) {
         if (strcmp(value, AUDIO_PARAMETER_VALUE_ON) == 0)
             adev->low_power = false;
@@ -4850,7 +4850,7 @@ static int adev_config_parse(struct tiny_audio_device *adev)
     int len;
 
     //property_get("ro.product.device", property, "tiny_hw");
-    snprintf(file, sizeof(file), "/system/etc/%s", "tiny_hw.xml");
+    snprintf(file, sizeof(file), "/system/vendor/etc/%s", "tiny_hw.xml");
 
     ALOGV("Reading configuration from %s\n", file);
     f = fopen(file, "r");

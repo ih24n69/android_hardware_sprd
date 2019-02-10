@@ -3,8 +3,7 @@ LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
-	SPRDAVCEncoder.cpp \
-	rgb2yuv_neon.s
+	SPRDAVCEncoder.cpp
 
 LOCAL_C_INCLUDES := \
 	frameworks/av/media/libstagefright/include \
@@ -31,12 +30,15 @@ LOCAL_SHARED_LIBRARIES := \
 	libstagefright_foundation \
 	libstagefrighthw \
 	libmemoryheapion \
+	libmedia \
 	libutils \
+	liblog \
 	libui \
 	libdl \
 	liblog
 
 LOCAL_MODULE := libstagefright_sprd_h264enc
+LOCAL_PROPRIETARY_MODULE := true
 LOCAL_MODULE_TAGS := optional
 
 ifeq ($(strip $(TARGET_BOARD_CAMERA_ANTI_SHAKE)),true)

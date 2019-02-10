@@ -26,6 +26,8 @@ LOCAL_MODULE := hwcomposer.$(TARGET_BOARD_PLATFORM)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
 
+LOCAL_PROPRIETARY_MODULE := true
+
 LOCAL_SHARED_LIBRARIES := \
 	libion_sprd \
 	liblog \
@@ -62,6 +64,7 @@ LOCAL_SRC_FILES := \
 	dump.cpp \
 
 LOCAL_C_INCLUDES := \
+	$(TOP)/frameworks/native/libs/nativewindow/include/ \
 	$(LOCAL_PATH)/../../gralloc/$(TARGET_BOARD_PLATFORM) \
 	$(LOCAL_PATH)/../../libmemoryheapion/ \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/video/ \

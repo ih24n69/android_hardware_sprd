@@ -19,17 +19,27 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES := ril_shim.cpp
-LOCAL_SHARED_LIBRARIES := libbinder liblog
-LOCAL_CPPFLAGS := -fexceptions
+LOCAL_SHARED_LIBRARIES := libbinder libcutils liblog
 LOCAL_MODULE := libril_shim
+LOCAL_PROPRIETARY_MODULE := true
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 include $(BUILD_SHARED_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_SRC_FILES := gps_shim.cpp
-LOCAL_SHARED_LIBRARIES := libbinder libgui libssl
+LOCAL_SHARED_LIBRARIES := libbinder libgui libssl libsensor
 LOCAL_MODULE := libgps_shim
+LOCAL_PROPRIETARY_MODULE := true
 LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+LOCAL_SRC_FILES := phoneserver_shim.cpp
+LOCAL_SHARED_LIBRARIES := libdl liblog libcutils
+LOCAL_MODULE := libphoneserver_shim
+LOCAL_MODULE_TAGS := optional
+LOCAL_PROPRIETARY_MODULE := true
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
 include $(BUILD_SHARED_LIBRARY)

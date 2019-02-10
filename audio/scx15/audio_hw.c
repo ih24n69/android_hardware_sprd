@@ -43,6 +43,8 @@
 #include <tinyalsautils.h>
 #include <audio_utils/resampler.h>
 
+#include <AtChannel.h>
+
 #include "audio_pga.h"
 #include "vb_effect_if.h"
 #include "vb_pga.h"
@@ -4144,7 +4146,7 @@ static int adev_config_parse(struct tiny_audio_device *adev)
     int len;
 
     //property_get("ro.product.device", property, "tiny_hw");
-    snprintf(file, sizeof(file), "/system/etc/%s", "tiny_hw.xml");
+    snprintf(file, sizeof(file), "/system/vendor/etc/%s", "tiny_hw.xml");
 
     ALOGV("Reading configuration from %s\n", file);
     f = fopen(file, "r");

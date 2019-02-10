@@ -26,6 +26,8 @@ LOCAL_MODULE := hwcomposer.$(TARGET_BOARD_PLATFORM)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
 
+LOCAL_PROPRIETARY_MODULE := true
+
 LOCAL_SHARED_LIBRARIES := \
 	libion_sprd \
 	liblog \
@@ -105,15 +107,6 @@ DEVICE_USE_FB_HW_VSYNC := true
 ifneq ($(strip $(SOC_SCX35)),true)
 DEVICE_DIRECT_DISPLAY_SINGLE_OSD_LAYER := true
 endif
-endif
-
-# Force x/ydpi values reported by hwcomposer
-ifneq ($(DEVICE_REPORT_XDPI),)
-LOCAL_CFLAGS += -DDEVICE_REPORT_XDPI=$(DEVICE_REPORT_XDPI)
-endif
-
-ifneq ($(DEVICE_REPORT_YDPI),)
-LOCAL_CFLAGS += -DDEVICE_REPORT_YDPI=$(DEVICE_REPORT_YDPI)
 endif
 
 ifeq ($(TARGET_BOARD_PLATFORM),scx15)

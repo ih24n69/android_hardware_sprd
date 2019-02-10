@@ -358,22 +358,12 @@ int SprdHWComposer:: getDisplayAttributes(int disp, uint32_t config, const uint3
                 ALOGI("getDisplayAttributes: disp:%d height:%d", disp, dpyAttr->yres);
                 break;
             case HWC_DISPLAY_DPI_X:
-#ifdef DEVICE_REPORT_XDPI
-                value[i] = (int32_t) DEVICE_REPORT_XDPI * 1000;
-                ALOGI("getDisplayAttributes: disp:%d xdpi:%f overridden at ", disp, dpyAttr->xdpi / 1000.0, DEVICE_REPORT_XDPI);
-#else
                 value[i] = (int32_t)(dpyAttr->xdpi);
                 ALOGI("getDisplayAttributes: disp:%d xdpi:%f", disp, dpyAttr->xdpi / 1000.0);
-#endif
                 break;
             case HWC_DISPLAY_DPI_Y:
-#ifdef DEVICE_REPORT_YDPI
-                value[i] = (int32_t) DEVICE_REPORT_YDPI * 1000;
-                ALOGI("getDisplayAttributes: disp:%d ydpi:%f overridden at ", disp, dpyAttr->ydpi / 1000.0, DEVICE_REPORT_YDPI);
-#else
                 value[i] = (int32_t)(dpyAttr->ydpi);
                 ALOGI("getDisplayAttributes: disp:%d ydpi:%f", disp, dpyAttr->ydpi / 1000.0);
-#endif
                 break;
             default:
                 ALOGE("Unknown Display Attributes:%d", attributes[i]);

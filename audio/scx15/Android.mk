@@ -25,6 +25,8 @@ LOCAL_MODULE := audio.primary.$(TARGET_BOARD_PLATFORM)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
 
+LOCAL_PROPRIETARY_MODULE := true
+
 LOCAL_CFLAGS := \
 	-D_POSIX_SOURCE \
 	-Wno-multichar \
@@ -74,6 +76,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libnvexchange \
 	libdumpdata \
 	libhardware_legacy \
+	libatchannel \
 
 LOCAL_REQUIRED_MODULES := \
 	liblog \
@@ -87,6 +90,7 @@ LOCAL_REQUIRED_MODULES := \
 	libnvexchange \
 	libdumpdata \
 	libhardware_legacy \
+	libatchannel \
 
 LOCAL_MODULE_TAGS := optional
 

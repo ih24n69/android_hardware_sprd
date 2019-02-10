@@ -21,7 +21,7 @@ supported_boards := \
 
 ifneq (,$(filter $(supported_boards),$(TARGET_BOARD_PLATFORM)))
 ifeq ($(SOC_SCX35),true)
-include $(call all-named-subdir-makefiles,scx15)
+include $(call all-named-subdir-makefiles, scx15)
 else
 include $(call all-named-subdir-makefiles,$(TARGET_BOARD_PLATFORM))
 endif

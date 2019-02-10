@@ -1,6 +1,8 @@
 #ifndef __ENG_AUDIO_H__
 #define __ENG_AUDIO_H__
 
+#include <system/audio.h>
+
 #define NAME_LEN_MAX                            16
 #define EQ_BAND_MAX				8
 #define EQ_MODE_MAX                             6
@@ -44,7 +46,7 @@
 #define AUDIO_AT_FM_LOOP_VBC_NAME "FM loop vbc"
 #define AUDIO_AT_VOIP_DSP_PROCESS_NAME "VOIP DSP Pro"
 
-#define ENG_AUDIO_PARA  			"/etc/audio_para"
+#define ENG_AUDIO_PARA  			"/vendor/etc/audio_para"
 #define ENG_AUDIO_PARA_DEBUG 			"/data/local/media/audio_para"
 #define AUDFIFO "/data/local/media/audiopara_tuning"
 #define AUDFIFO_2 "/data/local/media/audiopara_tuning_2"
@@ -78,8 +80,6 @@ enum{
 	SET_CALIBRATION_ENABLE,
 };
 
-#include <system/audio.h>
-
 enum {
     AUDIO_DEVICE_OUT_FM_HEADSET                = 0x10000000,
     AUDIO_DEVICE_OUT_FM_SPEAKER                = 0x20000000,
@@ -110,6 +110,7 @@ enum {
                                  AUDIO_DEVICE_OUT_SPEAKER_SAFE |
                                  AUDIO_DEVICE_OUT_IP |
                                  AUDIO_DEVICE_OUT_BUS |
+                                 AUDIO_DEVICE_OUT_PROXY |
                                  AUDIO_DEVICE_OUT_FM_HEADSET |
                                  AUDIO_DEVICE_OUT_FM_SPEAKER |
                                  AUDIO_DEVICE_OUT_DEFAULT),
